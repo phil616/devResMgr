@@ -28,15 +28,25 @@ jobs:
     - name: Save image as tar
       run: docker save -o fastapi-app.tar fastapi-app:latest
 
-    - name: Transfer image to server
+      - name: Transfer image to temporary directory
       uses: appleboy/scp-action@v0.1.5
       with:
         host: ${{ secrets.SERVER_IP }}
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "fastapi-app.tar"
-        target: "/tmp/fastapi-app.tar"
+        target: "/home/${{ secrets.SSH_USERNAME }}/fastapi-app.tar"  # 用户主目录
+    
+    - name: Move file with sudo
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
 
+          sudo mv /home/${{ secrets.SSH_USERNAME }}/fastapi-app.tar /opt/fastapi-app.tar
+          sudo chmod 644 /opt/fastapi-app.tar
     
     - name: Deploy on server
       uses: appleboy/ssh-action@v0.1.8
