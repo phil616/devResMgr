@@ -132,10 +132,7 @@
       if (checkAuthorizaion()){
         this.loggedIn = true;
       }
-    },
-    created() {
-      this.fetchOAuth();
-    },
+    }
   };
   </script>
   

@@ -5,7 +5,6 @@ Vue.use(Router);
 
 const router = new Router({
   mode: 'history',
-  base: process.env.VUE_APP_BASE_URL,
 
   routes: [
     {
@@ -17,12 +16,6 @@ const router = new Router({
       path: "/home",
       name: "Home",
       component: () => import('@/views/HomeView.vue'),
-    },
-    {
-      path: "/user",
-      name: "User",
-      component: () => import('@/views/UserView.vue'),
-      meta: { requiresAuth: true }
     },
     {
       path: "/login",
