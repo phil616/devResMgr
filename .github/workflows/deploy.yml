@@ -28,7 +28,7 @@ jobs:
     - name: Save image as tar
       run: docker save -o fastapi-app.tar fastapi-app:latest
 
-      - name: Transfer image to temporary directory
+    - name: Transfer image to temporary directory
       uses: appleboy/scp-action@v0.1.5
       with:
         host: ${{ secrets.SERVER_IP }}
