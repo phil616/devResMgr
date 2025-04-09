@@ -6,7 +6,7 @@
       </div>
 
       <v-spacer></v-spacer>
-      <v-btn @click="$router.push('/user')" text>
+      <v-btn @click="$router.push('/login')" text>
         <!--User Profile-->
         <v-icon>mdi-account</v-icon>
       </v-btn>

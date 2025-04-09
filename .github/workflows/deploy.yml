@@ -1,0 +1,60 @@
+name: Deploy FastAPI
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build Docker image
+      run: |
+        docker build \
+          -t fastapi-app:latest \
+          -f backend/Dockerfile \
+          --build-arg TOKEN_SECRET=${{ secrets.TOKEN_SECRET }} \
+          --build-arg DB_HOST=${{ secrets.DB_HOST }} \
+          --build-arg DB_PORT=${{ secrets.DB_PORT }} \
+          --build-arg DB_USER=${{ secrets.DB_USER }} \
+          --build-arg DB_PASS=${{ secrets.DB_PASS }} \
+          --build-arg DB_NAME=${{ secrets.DB_NAME }} \
+          ./backend
+
+    - name: Save image as tar
+      run: docker save -o fastapi-app.tar fastapi-app:latest
+
+    - name: Transfer image to server
+      uses: appleboy/scp-action@v0.1.5
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "fastapi-app.tar"
+        target: "/tmp/fastapi-app.tar"
+
+    
+    - name: Deploy on server
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          sudo docker load -i /tmp/fastapi-app.tar
+          sudo docker stop fastapi-app || true
+          sudo docker rm fastapi-app || true
+          sudo docker run -d --name fastapi-app \
+            -p 8000:8000 \
+            -e TOKEN_SECRET=${{ secrets.TOKEN_SECRET }} \
+            -e DB_HOST=${{ secrets.DB_HOST }} \
+            -e DB_PORT=${{ secrets.DB_PORT }} \
+            -e DB_USER=${{ secrets.DB_USER }} \
+            -e DB_PASS=${{ secrets.DB_PASS }} \
+            -e DB_NAME=${{ secrets.DB_NAME }} \
+            fastapi-app:latest
+          sudo rm /tmp/fastapi-app.tar

@@ -12,7 +12,7 @@ class UserSchema(BaseModel):
 
 def create_token(user_id: int) -> str:
     """Gen token, token structure = uid.sha256(uid+secret)"""
-    token = f"uid={user_id}." + sha256((str(user_id) + settings.TOKEN_SECRET).encode()).hexdigest()
+    token = f"{user_id}." + sha256((str(user_id) + settings.TOKEN_SECRET).encode()).hexdigest()
     return token
 
 async def verify_token(Token: Annotated[str, Header(...)]):
@@ -22,7 +22,7 @@ async def verify_token(Token: Annotated[str, Header(...)]):
         assert sha256((uid + settings.TOKEN_SECRET).encode()).hexdigest() == token
     except:
         raise HTTPException(status_code=401, detail="Invalid token")
-    return uid.split('=')[1]
+    return uid
 
 auth_router = APIRouter(prefix="/auth", tags=['auth'])
 

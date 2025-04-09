@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from model import KVStore
 import requests
 from pydantic import BaseModel
 
 from fastapi import APIRouter, HTTPException
-service_router = APIRouter(prefix="/domain", tags=['domain'])
+from api import verify_token
+service_router = APIRouter(prefix="/domain", tags=['domain'], dependencies=[Depends(verify_token)])
 
 async def get_cf_api_key() -> str:
     cf_api = await KVStore.filter(key="cloudflare_api").first()

@@ -97,6 +97,7 @@
             if (response.status == 200) {
               let token = response.data;
               Cookies.set("token", token)
+              sessionStorage.setItem("token", token)
               this.$store.dispatch("set_authenticated", true)
               this.$store.dispatch("set_user_token", token)
               this.$router.push(this.$route.query.redirect || '/')

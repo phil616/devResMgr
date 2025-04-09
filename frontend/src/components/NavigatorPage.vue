@@ -77,7 +77,7 @@ data: () => ({
   },
   methods: {
     linkto(link) {
-      this.$router.replace({path: link});
+      this.$router.push({path: link});
       this.drawerSwitch = false;
     },
     drawBack() {

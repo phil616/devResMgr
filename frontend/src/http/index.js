@@ -29,7 +29,7 @@ service.interceptors.request.use(
     // get token from cookie
     const token = getToken('token');
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers['Token'] = `${token}`;
     }
     return config;
   },

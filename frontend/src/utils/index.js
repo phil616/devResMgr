@@ -1,9 +1,9 @@
 import Cookies from "js-cookie";
 
 function checkAuthorizaion() {
-    console.log("Checking authorization");
     const token = Cookies.get("token");
     if (token) {
+        sessionStorage.setItem("token", token);
         return true
     } else {
         return false;

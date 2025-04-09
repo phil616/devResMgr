@@ -11,7 +11,8 @@ from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.lighthouse.v20200324 import lighthouse_client, models
 from pydantic import BaseModel
-light_house_router = APIRouter(prefix="/instance", tags=['lighthouse'])
+from api import verify_token
+light_house_router = APIRouter(prefix="/instance", tags=['lighthouse'], dependencies=[Depends(verify_token)])
 
 async def get_tencent_tuples()-> tuple:
     """
@@ -72,14 +73,10 @@ async def api_get_lighthouset_firewall_rules(instance_id: str, region: str):
         cred = credential.Credential(SecretId, SecretKey)
         httpProfile = HttpProfile()
         httpProfile.endpoint = "lighthouse.tencentcloudapi.com"
-
-        # 实例化一个client选项，可选的，没有特殊需求可以跳过
         clientProfile = ClientProfile()
         clientProfile.httpProfile = httpProfile
-        # 实例化要请求产品的client对象,clientProfile是可选的
-        client = lighthouse_client.LighthouseClient(cred, region, clientProfile)
 
-        # 实例化一个请求对象,每个接口都会对应一个request对象
+        client = lighthouse_client.LighthouseClient(cred, region, clientProfile)
         req = models.DescribeFirewallRulesRequest()
         params = {
             "InstanceId": instance_id
@@ -91,16 +88,6 @@ async def api_get_lighthouset_firewall_rules(instance_id: str, region: str):
     except TencentCloudSDKException as err:
         raise HTTPException(status_code=400, detail=str(err))
 
-"""
-
-    FirewallRule Model
-    Protocol: TCP, UDP, ICMP, ALL, ICMPv6
-    Port: 0-65535
-    CidrBlock: 0.0.0.0/0 # 与Ipv6CidrBlock互斥
-    Ipv6CidrBlock: ::/0  # 与CidrBlock互斥
-    Action: ACCEPT, DROP
-    FirewallRuleDescription: "description"
-    """
 class FirewallRule(BaseModel):
     Protocol: Literal["TCP", "UDP", "ICMP", "ALL", "ICMPv6"]
     Port: str
