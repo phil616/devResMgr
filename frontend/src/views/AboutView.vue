@@ -62,7 +62,7 @@ export default {
   name: 'AboutView',
   data() {
     return {
-      commitHash: process.env.VUE_APP_COMMIT || '未知版本'
+      commitHash: process.env.CF_PAGES_COMMIT_SHA || '未知版本'
     }
   }
 }
